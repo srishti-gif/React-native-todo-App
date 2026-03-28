@@ -1,30 +1,57 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import DateStrip from './src/components/dateStrip';
 import TaskCard from './src/components/taskCard';
-import { mockTasks } from './src/components/mockData';
 import AddTodo from './src/components/addTodo';
 import { SearchTodo } from './src/components/searchTodo';
+import { mockTasks } from './src/components/mockData';
+
+const DATES_FROM_NOW = 7;
+  // Priority sort order
+  const priorityOrder: Record<string, number> = {
+    high: 1,
+    medium: 2,
+    low: 3,
+  };
 
 const App = () => {
-  const [tasks, setTasks] = useState(mockTasks);
+  const [tasks, setTasks] = useState([...mockTasks]);
   const [search, setSearch] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [editingTask, setEditingTask] = useState(null);
 
+
+
+ const dates = useMemo(() => {
+   const today = new Date();
+   return Array.from({ length: DATES_FROM_NOW }, (_, index) => {
+     const d = new Date();
+     d.setDate(today.getDate() + index);
+     const key = d.toISOString().split('T')[0];
+     const label = d.toDateString().slice(4, 10);
+     return { key, label };
+   });
+ }, []);
+ const [selectedDate, setSelectedDate] = useState<string | null>(
+   dates[0]?.key ?? null,
+ );
+
+ const updateTodo = (id: number, title: string, desc: string, priority: string) => {
+    setTasks(prev =>
+      prev.map(t =>
+        t.id === id ? { ...t, title, desc, priority: priority as 'high' | 'medium' | 'low' } : t,
+      ),
+    );
+  }
 
   const addNewTask = (title: string, priority: string) => {
+    if (!selectedDate) return; 
+
     const newTask = {
       id: Date.now(),
       date: selectedDate,
       title,
       desc: '',
-      priority,
+      priority: priority as 'high' | 'medium' | 'low',
       category: 'General',
       done: false,
     };
@@ -32,71 +59,32 @@ const App = () => {
     setTasks(prev => [newTask, ...prev]);
   };
 
-  const getDates = () => {
-    const dates = [];
-    const today = new Date();
-
-    for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(today.getDate() + i);
-
-      const key = d.toISOString().split('T')[0]; 
-      const label = d.toDateString().slice(4, 10); 
-
-      dates.push({
-        key,
-        label,
-      });
-    }
-
-    return dates;
-  };
-
-  const [dates] = useState(getDates());
-// Set the initial selected date to the first date in the list when the component mounts or when the dates array changes
-  useEffect(() => {
-    if (dates.length > 0) {
-      setSelectedDate(dates[0].key);
-    }
-  }, [dates]);
-
-
- // Function to toggle the 'done' status of a task based on its ID
   const toggleDone = (id: number) => {
-    const updated = tasks.map(t => (t.id === id ? { ...t, done: !t.done } : t));
-    setTasks(updated);
+    setTasks(prev =>
+      prev.map(t => (t.id === id ? { ...t, done: !t.done } : t)),
+    );
   };
 
- // Function to delete a task based on its ID by filtering it out of the tasks array
+
   const deleteTask = (id: number) => {
-    setTasks(tasks.filter(t => t.id !== id));
+    setTasks(prev => prev.filter(t => t.id !== id));
   };
 
-  //setting prioty order for sorting
-  const priorityOrder: any = {
-    high: 1,
-    medium: 2,
-    low: 3,
-  };
 
- const filteredTasks = tasks
-   .filter(item => {
-    //filtering tasks based on selected date and search query
-     const matchDate = item.date === selectedDate;
-     //checking if task title includes search query (case-insensitive)
-     const matchSearch = item.title
-       .toLowerCase()
-       .includes(search.toLowerCase());
-      //only include tasks that match both the selected date and search query
-     return matchDate && matchSearch;
-   })
-   //sorting tasks based on priority using the defined priority order   .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
-   //sorting tasks so that incomplete tasks come before completed ones
-   .sort((a, b) => Number(a.done) - Number(b.done))
-   //final sort to ensure consistent order for tasks with same priority and done status
-   .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+  const filteredTasks = useMemo(() => {
+    if (!selectedDate) return []; 
 
-  
+    return tasks
+      .filter(item => {
+        const matchDate = item.date === selectedDate;
+        const matchSearch = item.title
+          .toLowerCase()
+          .includes(search.toLowerCase());
+        return matchDate && matchSearch;
+      })
+      .sort((a, b) => Number(a.done) - Number(b.done)) 
+      .sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]); 
+  }, [tasks, selectedDate, search]);
 
   return (
     <View
@@ -118,12 +106,12 @@ const App = () => {
       />
 
       <View
-        style={{ flexDirection: 'column', justifyContent: 'space-between' }} >
+        style={{ flexDirection: 'column', justifyContent: 'space-between' }}
+      >
         <SearchTodo setSearch={setSearch} />
         <AddTodo addNewTask={addNewTask} />
       </View>
 
-     
       <FlatList
         data={filteredTasks}
         showsVerticalScrollIndicator
@@ -133,11 +121,15 @@ const App = () => {
             item={item}
             toggleDone={toggleDone}
             deleteTask={deleteTask}
+            updateTodo={updateTodo}
+           
           />
         )}
         ListEmptyComponent={
           <Text style={{ color: 'gray', marginTop: 20 }}>
-            No tasks for this day 🚀
+            {selectedDate
+              ? 'No tasks for this day 🚀'
+              : 'Select a date to see tasks 📅'}
           </Text>
         }
       />

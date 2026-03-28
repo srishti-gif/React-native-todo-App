@@ -1,17 +1,17 @@
 
 
-const today = new Date();
+const today = new Date().toISOString().split('T')[0];
 
-function dateKey({offsetDays} :any) {
-  const d = new Date(today);
-  d.setDate(today.getDate() + offsetDays);
+function dateKey(offsetDays: number) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
   return d.toISOString().split('T')[0]; 
 }
 
 export const mockTasks = [
   {
     id: 1,
-    date: dateKey(0),
+    date: today,
     title: 'Fix login screen bug',
     desc: 'Auth flow crashes on empty email',
     priority: 'high',
@@ -20,7 +20,7 @@ export const mockTasks = [
   },
   {
     id: 2,
-    date: dateKey(0),
+    date: today,
     title: 'Review PR #42',
     desc: "Team's new feature branch",
     priority: 'medium',
@@ -29,7 +29,7 @@ export const mockTasks = [
   },
   {
     id: 3,
-    date: dateKey(0),
+    date: today,
     title: 'Buy groceries',
     desc: 'Milk, eggs, bread, coffee',
     priority: 'low',
@@ -38,7 +38,7 @@ export const mockTasks = [
   },
   {
     id: 4,
-    date: dateKey(0),
+    date: today,
     title: '30 min workout',
     desc: 'Chest + triceps day',
     priority: 'medium',
@@ -47,7 +47,7 @@ export const mockTasks = [
   },
   {
     id: 5,
-    date: dateKey(0),
+    date: today,
     title: 'Read React Native docs',
     desc: 'FlatList and ScrollView section',
     priority: 'high',
@@ -56,7 +56,7 @@ export const mockTasks = [
   },
   {
     id: 6,
-    date: dateKey(1),
+    date: today,
     title: 'Write unit tests',
     desc: 'Cover the new utils functions',
     priority: 'high',
@@ -65,7 +65,7 @@ export const mockTasks = [
   },
   {
     id: 7,
-    date: dateKey(1),
+    date: today,
     title: 'Call mom',
     desc: 'Sunday catch-up',
     priority: 'medium',
@@ -74,7 +74,7 @@ export const mockTasks = [
   },
   {
     id: 8,
-    date: dateKey(1),
+    date: today,
     title: 'Update resume',
     desc: 'Add latest project experience',
     priority: 'low',

@@ -51,7 +51,7 @@ export default function AddTodo({ addNewTask }: any) {
         ))}
       </View>
 
-      {/* ADD BUTTON */}
+        
       <TouchableOpacity
         onPress={handleAdd}
         style={{

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput } from 'react-native';
-import { useDebounce } from './useDebounce';
+import { useDebounce } from '../hooks/useDebounce';
 
 export  function SearchTodo({ setSearch }: any) {
   const [input, setInput] = useState('');
