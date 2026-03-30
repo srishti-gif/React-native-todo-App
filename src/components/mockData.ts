@@ -2,7 +2,7 @@
 
 const today = new Date();
 
-function dateKey({offsetDays} :any) {
+function dateKey(offsetDays:number) {
   const d = new Date(today);
   d.setDate(today.getDate() + offsetDays);
   return d.toISOString().split('T')[0]; 
