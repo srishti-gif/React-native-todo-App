@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import DateStrip from './src/components/dateStrip';
 import TaskCard from './src/components/taskCard';
 import AddTodo from './src/components/addTodo';
@@ -17,7 +17,6 @@ const DATES_FROM_NOW = 7;
 const App = () => {
   const [tasks, setTasks] = useState([...mockTasks]);
   const [search, setSearch] = useState('');
-  const [editingTask, setEditingTask] = useState(null);
 
 
 
@@ -88,12 +87,7 @@ const App = () => {
 
   return (
     <View
-      style={{
-        flex: 1,
-        padding: 20,
-        marginTop: 50,
-        backgroundColor: '#0f172a',
-      }}
+      style={styles.container}
     >
       <Text style={{ fontSize: 24, color: 'white', marginBottom: 10 }}>
         My Tasks
@@ -106,7 +100,7 @@ const App = () => {
       />
 
       <View
-        style={{ flexDirection: 'column', justifyContent: 'space-between' }}
+        // style={{ flexDirection: 'column', justifyContent: 'space-between' }}
       >
         <SearchTodo setSearch={setSearch} />
         <AddTodo addNewTask={addNewTask} />
@@ -138,3 +132,12 @@ const App = () => {
 };
 
 export default App;
+
+const styles= StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    //marginTop: 50,
+    backgroundColor: '#0f172a',
+  },
+})
